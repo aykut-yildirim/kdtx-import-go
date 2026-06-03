@@ -1,0 +1,34 @@
+# Build stage
+FROM golang:1.26-alpine AS builder
+
+WORKDIR /app
+
+# dependency cache
+COPY go.mod go.sum .env.local ./
+RUN go mod download
+
+# copy source
+COPY . .
+
+# build binary (statik compile)
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
+    go build -o worker_bin ./cmd/worker
+
+
+# Runtime stage (minimal image)
+FROM alpine:3.20
+
+WORKDIR /app
+
+# CA cert (HTTP / HTTPS calls için önemli)
+RUN apk --no-cache add ca-certificates
+
+# copy binary
+COPY --from=builder /app/worker_bin /app/worker
+COPY --from=builder /app/.env.local /app/.env.local
+
+# environment
+ENV WORKER_ROLE=manager
+
+# run
+CMD ["/app/worker"]

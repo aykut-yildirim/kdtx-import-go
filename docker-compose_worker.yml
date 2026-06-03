@@ -1,0 +1,20 @@
+version: "3.9"
+
+services:
+  import-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile_worker
+    image: ktx-import_go_worker_${ENV}
+    container_name: ktx-import_go_worker_${ENV}
+    networks:
+      - kudtax-new-dev-network
+    env_file:
+      - .env.${ENV}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: always
+
+networks:
+  kudtax-new-dev-network:
+    external: true

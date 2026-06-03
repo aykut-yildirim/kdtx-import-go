@@ -1,0 +1,39 @@
+# ----------------------
+# BUILD STAGE
+# ----------------------
+FROM golang:1.26-alpine AS builder
+
+WORKDIR /app
+
+# dependencies cache
+COPY go.mod go.sum ./
+RUN go mod download
+
+# source code
+COPY . .
+
+# build binary
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
+    go build -trimpath -ldflags="-s -w" -o api ./cmd/api
+
+
+# ----------------------
+# RUNTIME STAGE
+# ----------------------
+FROM alpine:3.20
+
+WORKDIR /app
+
+# certificates (HTTPS calls için)
+RUN apk --no-cache add ca-certificates
+
+# copy binary
+COPY --from=builder /app/api /app/api
+
+# environment
+ENV PORT=8000
+
+EXPOSE 8000
+
+# run server
+CMD ["/app/api"]

@@ -1,0 +1,21 @@
+version: "3.9"
+
+services:
+  import-api:
+    build:
+      context: .
+      dockerfile: Dockerfile_api
+    image: ktx-import_go_api_${ENV}
+    container_name: ktx-import_go_api_${ENV}
+    networks:
+      - kudtax-new-dev-network
+    env_file:
+      - .env.${ENV}
+    ports:
+      - "8192:8000"
+
+    restart: always
+
+networks:
+  kudtax-new-dev-network:
+    external: true

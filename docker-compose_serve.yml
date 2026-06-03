@@ -1,0 +1,114 @@
+version: "3.9"
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq.${ENV}_go
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    env_file:
+      - .env.${ENV}
+    networks:
+      - kudtax-new-dev-network
+    restart: always
+
+  mongo:
+    image: mongo:7
+    container_name: mongo.${ENV}_go
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    env_file:
+      - .env.${ENV}
+    networks:
+      - kudtax-new-dev-network
+    restart: always
+
+  redis:
+    image: redis:7
+    container_name: redis.${ENV}_go
+    command:
+    - redis-server
+    - --requirepass
+    - ${REDIS_PASSWORD}
+    - --appendonly
+    - "yes"
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "PING"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    env_file:
+      - .env.${ENV}
+    networks:
+      - kudtax-new-dev-network
+    restart: always
+
+  minio:
+    image: minio/minio
+    container_name: minio.${ENV}_go
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    env_file:
+      - .env.${ENV}
+    networks:
+      - kudtax-new-dev-network
+    restart: always
+
+  postgres:
+   image: postgres:16
+   container_name: postgres.${ENV}
+   env_file:
+     - .env.${ENV}
+   ports:
+     - "5432:5432"
+   volumes:
+     - postgres_data:/var/lib/postgresql/data
+  #  healthcheck:
+  #    test: ["CMD", "pg_isready", "-h", "localhost"]
+  #    interval: 5s
+  #    timeout: 5s
+  #    retries: 10
+   networks:
+     - kudtax-new-dev-network
+   restart: always
+
+
+
+networks:
+  kudtax-new-dev-network:
+    external: true
+
+volumes:
+  mongo_data:
+  redis_data:
+  minio_data:
+  rabbitmq_data:
+  postgres_data:
