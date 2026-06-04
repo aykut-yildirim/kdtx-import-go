@@ -15,7 +15,7 @@ func (i TransactionFileImporter) FileLoad(
 	ctx *models.Context,
 ) error {
 	fmt.Println("- FileLoad -")
-	data, err := helper.GetFile(*ctx)
+	data, err := helpers.GetFile(*ctx)
 
 	fmt.Println("test")
 

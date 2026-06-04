@@ -21,7 +21,7 @@ func (i TransactionFileImporter) FileLoad(
 	ctx *models.Context,
 ) error {
 
-	data, err := helper.GetFile(
+	data, err := helpers.GetFile(
 		*ctx,
 	)
 
