@@ -5,20 +5,19 @@ import (
 	"encoding/csv"
 	"fmt"
 
-	"myapp/internal/importer"
-	"myapp/internal/storage"
+	"myapp/internal/helpers"
+	"myapp/internal/models"
 )
 
 type TransactionFileImporter struct{}
 
-func (i TransactionFileImporter) Load(
-	ctx *importer.Context,
+func (i TransactionFileImporter) FileLoad(
+	ctx *models.Context,
 ) error {
-	fmt.Println("--Load")
+	fmt.Println("- FileLoad -")
+	data, err := helper.GetFile(*ctx)
 
-	data, err := storage.ReadLocalFile(
-		*ctx.Task.LocalPath,
-	)
+	fmt.Println("test")
 
 	if err != nil {
 		return err
@@ -29,18 +28,25 @@ func (i TransactionFileImporter) Load(
 	return nil
 }
 
-func (i TransactionFileImporter) Fetch(
-	ctx *importer.Context,
+func (i TransactionFileImporter) LoginControl(
+	ctx *models.Context,
 ) error {
-	fmt.Println("--Fetch")
 
 	return nil
 }
 
-func (i TransactionFileImporter) Parse(
-	ctx *importer.Context,
+func (i TransactionFileImporter) Fetch(
+	ctx *models.Context,
 ) error {
-	fmt.Println("--Parse")
+	return nil
+}
+
+func (i TransactionFileImporter) Map(
+	ctx *models.Context,
+) (interface{}, error) {
+
+	var transactions []map[string]interface{}
+
 	reader := csv.NewReader(
 		bytes.NewReader(ctx.RawData),
 	)
@@ -48,26 +54,12 @@ func (i TransactionFileImporter) Parse(
 	rows, err := reader.ReadAll()
 
 	if err != nil {
-		return err
+		return transactions, err
 	}
-
-	ctx.Parsed = rows
-
-	return nil
-}
-
-func (i TransactionFileImporter) Transform(
-	ctx *importer.Context,
-) error {
-	fmt.Println("--Transform")
-
-	rows := ctx.Parsed.([][]string)
-
-	var transactions []map[string]interface{}
 
 	for index, row := range rows {
 
-		fmt.Println(index, row)
+		// fmt.Println(index, row)
 
 		transactions = append(
 			transactions,
@@ -79,14 +71,6 @@ func (i TransactionFileImporter) Transform(
 	}
 
 	ctx.Result = transactions
-
-	return nil
-}
-
-func (i TransactionFileImporter) Response(
-	ctx *importer.Context,
-) (interface{}, error) {
-	fmt.Println("--Response")
 
 	return ctx.Result, nil
 }

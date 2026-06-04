@@ -1,23 +1,21 @@
 package amazon
 
 import (
-	"encoding/csv"
 	"bytes"
+	"encoding/csv"
+	"fmt"
 
-	"myapp/internal/importer"
-	"myapp/internal/storage"
+	"myapp/internal/helpers"
+	"myapp/internal/models"
 )
 
 type TransactionFileImporter struct{}
 
-func (i TransactionFileImporter) Load(
-	ctx *importer.Context,
+func (i TransactionFileImporter) FileLoad(
+	ctx *models.Context,
 ) error {
-
-	data, err := storage.ReadLocalFile(
-		*ctx.Task.LocalPath,
-	)
-
+	fmt.Println("- FileLoad -")
+	data, err := helper.GetFile(*ctx)
 	if err != nil {
 		return err
 	}
@@ -27,16 +25,24 @@ func (i TransactionFileImporter) Load(
 	return nil
 }
 
-func (i TransactionFileImporter) Fetch(
-	ctx *importer.Context,
+func (i TransactionFileImporter) LoginControl(
+	ctx *models.Context,
 ) error {
 
 	return nil
 }
 
-func (i TransactionFileImporter) Parse(
-	ctx *importer.Context,
+func (i TransactionFileImporter) Fetch(
+	ctx *models.Context,
 ) error {
+	return nil
+}
+
+func (i TransactionFileImporter) Map(
+	ctx *models.Context,
+) (interface{}, error) {
+
+	var transactions []map[string]interface{}
 
 	reader := csv.NewReader(
 		bytes.NewReader(ctx.RawData),
@@ -45,40 +51,23 @@ func (i TransactionFileImporter) Parse(
 	rows, err := reader.ReadAll()
 
 	if err != nil {
-		return err
+		return transactions, err
 	}
 
-	ctx.Parsed = rows
+	for index, row := range rows {
 
-	return nil
-}
-
-func (i TransactionFileImporter) Transform(
-	ctx *importer.Context,
-) error {
-
-	rows := ctx.Parsed.([][]string)
-
-	var transactions []map[string]interface{}
-
-	for _, row := range rows {
+		// fmt.Println(index, row)
 
 		transactions = append(
 			transactions,
 			map[string]interface{}{
-				"row": row,
+				"row_index": index,
+				"row_value": row,
 			},
 		)
 	}
 
 	ctx.Result = transactions
-
-	return nil
-}
-
-func (i TransactionFileImporter) Response(
-	ctx *importer.Context,
-) (interface{}, error) {
 
 	return ctx.Result, nil
 }

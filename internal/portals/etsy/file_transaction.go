@@ -1,21 +1,28 @@
 package amazon
 
 import (
-	"encoding/csv"
-	"bytes"
+	"fmt"
 
-	"myapp/internal/importer"
-	"myapp/internal/storage"
+	"myapp/internal/helpers"
+	"myapp/internal/models"
 )
 
 type TransactionFileImporter struct{}
 
-func (i TransactionFileImporter) Load(
-	ctx *importer.Context,
+func (i TransactionFileImporter) LoginControl(
+	ctx *models.Context,
+) error {
+	fmt.Println("--LoginControl")
+
+	return nil
+}
+
+func (i TransactionFileImporter) FileLoad(
+	ctx *models.Context,
 ) error {
 
-	data, err := storage.ReadLocalFile(
-		*ctx.Task.LocalPath,
+	data, err := helper.GetFile(
+		*ctx,
 	)
 
 	if err != nil {
@@ -28,34 +35,16 @@ func (i TransactionFileImporter) Load(
 }
 
 func (i TransactionFileImporter) Fetch(
-	ctx *importer.Context,
+	ctx *models.Context,
 ) error {
 
 	return nil
 }
 
-func (i TransactionFileImporter) Parse(
-	ctx *importer.Context,
-) error {
 
-	reader := csv.NewReader(
-		bytes.NewReader(ctx.RawData),
-	)
-
-	rows, err := reader.ReadAll()
-
-	if err != nil {
-		return err
-	}
-
-	ctx.Parsed = rows
-
-	return nil
-}
-
-func (i TransactionFileImporter) Transform(
-	ctx *importer.Context,
-) error {
+func (i TransactionFileImporter) Map(
+	ctx *models.Context,
+)  (interface{}, error)  {
 
 	rows := ctx.Parsed.([][]string)
 
@@ -72,13 +61,6 @@ func (i TransactionFileImporter) Transform(
 	}
 
 	ctx.Result = transactions
-
-	return nil
-}
-
-func (i TransactionFileImporter) Response(
-	ctx *importer.Context,
-) (interface{}, error) {
 
 	return ctx.Result, nil
 }

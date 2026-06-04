@@ -1,7 +1,9 @@
 package importer
 
-import "myapp/internal/models"
-
+import (
+	"fmt"
+	"myapp/internal/models"
+)
 type DefaultPipeline struct {
 	Importer Importer
 }
@@ -10,25 +12,62 @@ func (p DefaultPipeline) Run(
 	task models.Task,
 ) (interface{}, error) {
 
-	ctx := &Context{
+	ctx := &models.Context{
 		Task: task,
 	}
 
-	if err := p.Importer.Load(ctx); err != nil {
+	fmt.Println(task.PortalKeyName, "- FileLoad -")
+	if err := p.Importer.FileLoad(ctx); err != nil {
+
 		return nil, err
+
 	}
 
+	fmt.Println(task.PortalKeyName, "- LoginControl -")
+	if err := p.Importer.LoginControl(ctx); err != nil {
+
+		return nil, err
+	}
+	
+	fmt.Println(task.PortalKeyName, "- Fetch -")
 	if err := p.Importer.Fetch(ctx); err != nil {
+		
 		return nil, err
 	}
+	
+	fmt.Println(task.PortalKeyName, "- Map -")
+	return p.Importer.Map(ctx)
+}
 
-	if err := p.Importer.Parse(ctx); err != nil {
-		return nil, err
+type Service struct{}
+
+func (s Service) Execute(
+	task models.Task,
+) (interface{}, error) {
+
+	fmt.Println("-- Service Execute")
+	fmt.Println(task)
+	key := fmt.Sprintf(
+		"%s:%s:%s",
+		task.PortalKeyName,
+		task.InputType,
+		task.PortalType,
+	)
+
+	imp, ok := Get(key)
+
+	if !ok {
+
+		return nil,
+			fmt.Errorf(
+				"portal not found: %s",
+				key,
+			)
 	}
 
-	if err := p.Importer.Transform(ctx); err != nil {
-		return nil, err
+	pipeline := DefaultPipeline{
+		Importer: imp,
 	}
 
-	return p.Importer.Response(ctx)
+	return pipeline.Run(task)
 }

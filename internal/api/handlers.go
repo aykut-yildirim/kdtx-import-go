@@ -10,6 +10,16 @@ import (
 	"myapp/internal/models"
 )
 
+type SuccessResponse struct {
+	Success bool        `json:"success"`
+	Data    interface{} `json:"data"`
+}
+
+type ErrorResponse struct {
+	Success bool   `json:"success"`
+	Error   string `json:"error"`
+}
+
 func FileImport(c *gin.Context) {
 	fmt.Println("FileImport")
 	
@@ -33,7 +43,6 @@ func FileImport(c *gin.Context) {
 	result, err := importer.Service{}.Execute(task)
 
 	if err != nil {
-
 		c.JSON(
 			http.StatusInternalServerError,
 			ErrorResponse{
@@ -41,9 +50,10 @@ func FileImport(c *gin.Context) {
 				Error:   err.Error(),
 			},
 		)
-
 		return
 	}
+
+	fmt.Println(task)
 
 	c.JSON(
 		http.StatusOK,
@@ -55,11 +65,13 @@ func FileImport(c *gin.Context) {
 }
 
 func ApiImport(c *gin.Context) {
-	FileImport(c)
+	fmt.Println("ApiImport")
 }
 
 func Healthy(c *gin.Context) {
-
+	
+	fmt.Println("Healthy")
+	
 	c.JSON(
 		http.StatusOK,
 		gin.H{
