@@ -1,9 +1,9 @@
 package importer
 
 import (
-	"fmt"
-	"sync"
 	"myapp/internal/models"
+	"myapp/internal/services"
+	"sync"
 )
 
 type Importer interface {
@@ -35,7 +35,7 @@ func Register(
 func Get(
 	key string,
 ) (Importer, bool) {
-	fmt.Println("Get", key)
+	services.Logger().STATUS("Get" + key)
 	mu.RLock()
 	defer mu.RUnlock()
 

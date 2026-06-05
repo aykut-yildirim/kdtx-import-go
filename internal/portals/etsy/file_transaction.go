@@ -1,10 +1,9 @@
 package amazon
 
 import (
-	"fmt"
-
 	"myapp/internal/helpers"
 	"myapp/internal/models"
+	"myapp/internal/services"
 )
 
 type TransactionFileImporter struct{}
@@ -12,7 +11,7 @@ type TransactionFileImporter struct{}
 func (i TransactionFileImporter) LoginControl(
 	ctx *models.Context,
 ) error {
-	fmt.Println("--LoginControl")
+	services.Logger().STATUS("--LoginControl")
 
 	return nil
 }
@@ -41,10 +40,9 @@ func (i TransactionFileImporter) Fetch(
 	return nil
 }
 
-
 func (i TransactionFileImporter) Map(
 	ctx *models.Context,
-)  (interface{}, error)  {
+) (interface{}, error) {
 
 	rows := ctx.Parsed.([][]string)
 

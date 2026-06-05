@@ -91,7 +91,7 @@ package importer
 // 		return err
 // 	}
 
-// 	fmt.Println("all_data_import completed successfully")
+// 	services.Logger().STATUS("all_data_import completed successfully")
 
 // 	return nil
 // }

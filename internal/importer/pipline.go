@@ -3,7 +3,9 @@ package importer
 import (
 	"fmt"
 	"myapp/internal/models"
+	"myapp/internal/services"
 )
+
 type DefaultPipeline struct {
 	Importer Importer
 }
@@ -16,26 +18,26 @@ func (p DefaultPipeline) Run(
 		Task: task,
 	}
 
-	fmt.Println(task.PortalKeyName, "- FileLoad -")
+	services.Logger().STATUS(task.PortalKeyName + "- FileLoad -")
 	if err := p.Importer.FileLoad(ctx); err != nil {
 
 		return nil, err
 
 	}
-
-	fmt.Println(task.PortalKeyName, "- LoginControl -")
+	services.Logger().STATUS("test 1")
+	services.Logger().STATUS(task.PortalKeyName + "- LoginControl -")
 	if err := p.Importer.LoginControl(ctx); err != nil {
 
 		return nil, err
 	}
-	
-	fmt.Println(task.PortalKeyName, "- Fetch -")
+
+	services.Logger().STATUS(task.PortalKeyName + "- Fetch -")
 	if err := p.Importer.Fetch(ctx); err != nil {
-		
+
 		return nil, err
 	}
-	
-	fmt.Println(task.PortalKeyName, "- Map -")
+
+	services.Logger().STATUS(task.PortalKeyName + "- Map -")
 	return p.Importer.Map(ctx)
 }
 
@@ -45,8 +47,8 @@ func (s Service) Execute(
 	task models.Task,
 ) (interface{}, error) {
 
-	fmt.Println("-- Service Execute")
-	fmt.Println(task)
+	services.Logger().STATUS("-- Service Execute")
+	services.Logger().STATUS(fmt.Sprintf("%+v", task))
 	key := fmt.Sprintf(
 		"%s:%s:%s",
 		task.PortalKeyName,

@@ -16,12 +16,9 @@ import (
 )
 
 func GetFile(ctx models.Context) ([]byte, error) {
-	fmt.Println("--GetFile")
+	services.Logger().STATUS("--GetFile")
 	if ctx.Task.FileMinioPath != nil {
-		fmt.Println("--GetFile--FileMinioPath")
-		// fmt.Println(ctx.Task.FileMinioPath)
-		// fmt.Println(*ctx.Task.FileMinioPath)
-
+		services.Logger().STATUS("--GetFile--FileMinioPath")
 		godotenv.Load(".env")
 		bucket := os.Getenv("MINIO_BUCKET")
 		key := *ctx.Task.FileMinioPath
@@ -38,9 +35,9 @@ func GetFile(ctx models.Context) ([]byte, error) {
 	}
 
 	if ctx.Task.LocalPath != nil {
-		fmt.Println("--GetFile--LocalPath")
-		fmt.Println(ctx.Task.LocalPath)
-		fmt.Println(*ctx.Task.LocalPath)
+		services.Logger().STATUS("--GetFile--LocalPath")
+		// services.Logger().STATUS(ctx.Task.LocalPath)
+		services.Logger().STATUS(*ctx.Task.LocalPath)
 
 		fileBytes, err := os.ReadFile(*ctx.Task.LocalPath)
 

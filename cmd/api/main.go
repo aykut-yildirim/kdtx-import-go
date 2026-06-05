@@ -1,14 +1,18 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
 	"myapp/internal/api"
+	"myapp/internal/services"
+	"github.com/gin-gonic/gin"
+
 	_ "myapp/internal/portals/amazon"
 	_ "myapp/internal/portals/etsy"
 	_ "myapp/internal/portals/stripe"
 )
 
 func main() {
+	services.Logger().STATUS("-- api - main.go")
+
 	r := gin.Default()
 
 	r.POST("/file_import", api.FileImport)

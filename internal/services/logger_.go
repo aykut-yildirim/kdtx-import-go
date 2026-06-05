@@ -2,16 +2,16 @@ package services
 
 import (
 	"fmt"
-	"os"
+	// "os"
 	"sync"
 	"time"
 	"google.golang.org/grpc"
 )
 
-var (
-	grpcEnabled = os.Getenv("GRPC_ENABLED") == "true"
-	grpcAddr    = os.Getenv("GRPC_IMPORT_WORKER_ADDR")
-)
+// var (
+// 	grpcEnabled = os.Getenv("GRPC_ENABLED") == "true"
+// 	grpcAddr    = os.Getenv("GRPC_IMPORT_WORKER_ADDR")
+// )
 
 // ---------------- COLORS ----------------
 
@@ -35,7 +35,7 @@ func (l *LoggerService) write(level, message string) {
 	now := time.Now().UTC()
 
 	fmt.Printf("%s %s[%s]%s %s\n",
-		now.Format(time.RFC3339),
+		now.Format("2006-01-02 15:04:05.000"),
 		color,
 		level,
 		reset,
@@ -45,12 +45,11 @@ func (l *LoggerService) write(level, message string) {
 
 type Log struct {
 	logger *LoggerService
-	
 	mu   sync.Mutex
 	conn *grpc.ClientConn
 }
 
-func NewLog() *Log {
+func Logger() *Log {
 	return &Log{
 		logger: &LoggerService{},
 	}
@@ -72,28 +71,25 @@ func (l *Log) STATUS(message string) {
 	l.logger.write("STATUS", message)
 }
 
-
 func (l *Log) STARTED(taskID string) {
 	l.logger.write("STARTED", "Portal Started" + taskID )
-
 }
 
 func (l *Log) FINISHED(taskID string) {
-
 	l.logger.write("FINISHED", "Portal Finished" + taskID)
 }
 
 func (l *Log) ERROR(err error) {
 	l.logger.write("ERROR", err.Error())
-
 }
 
-var LoggerServiceInstance = NewLog()
+// func LoggerSystem(message string) {
+// 	LoggerServiceInstance.SYSTEM(message)
+// }
 
-func LoggerSystem(message string) {
-	LoggerServiceInstance.SYSTEM(message)
-}
+// func LoggerStatus(message string, taskID int) {
+// 	LoggerServiceInstance.STATUS(fmt.Sprintf("%s (TaskID: %d)", message, taskID))
+// }
 
-func LoggerStatus(message string, taskID int) {
-	LoggerServiceInstance.STATUS(fmt.Sprintf("%s (TaskID: %d)", message, taskID))
-}
+// var LoggerServiceInstance = NewLog()
+

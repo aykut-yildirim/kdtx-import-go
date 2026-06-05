@@ -3,10 +3,10 @@ package amazon
 import (
 	"bytes"
 	"encoding/csv"
-	"fmt"
 
 	"myapp/internal/helpers"
 	"myapp/internal/models"
+	"myapp/internal/services"
 )
 
 type TransactionFileImporter struct{}
@@ -14,10 +14,10 @@ type TransactionFileImporter struct{}
 func (i TransactionFileImporter) FileLoad(
 	ctx *models.Context,
 ) error {
-	fmt.Println("- FileLoad -")
+	services.Logger().STATUS("- FileLoad -")
 	data, err := helpers.GetFile(*ctx)
 
-	fmt.Println("test")
+	services.Logger().STATUS("test")
 
 	if err != nil {
 		return err
@@ -59,7 +59,7 @@ func (i TransactionFileImporter) Map(
 
 	for index, row := range rows {
 
-		// fmt.Println(index, row)
+		// services.Logger().STATUS(index, row)
 
 		transactions = append(
 			transactions,

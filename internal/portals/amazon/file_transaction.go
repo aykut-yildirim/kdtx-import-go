@@ -10,6 +10,7 @@ import (
 
 	"myapp/internal/helpers"
 	"myapp/internal/models"
+	"myapp/internal/services"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -19,12 +20,12 @@ type TransactionFileImporter struct{}
 func (i TransactionFileImporter) FileLoad(
 	ctx *models.Context,
 ) error {
-	fmt.Println("- FileLoad -")
+	services.Logger().STATUS("- FileLoad -")
 	data, err := helpers.GetFile(*ctx)
 	if err != nil {
 		return err
 	}
-	
+
 	ctx.RawData = data
 	return nil
 }

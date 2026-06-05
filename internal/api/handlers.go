@@ -8,6 +8,7 @@ import (
 
 	"myapp/internal/importer"
 	"myapp/internal/models"
+	"myapp/internal/services"
 )
 
 type SuccessResponse struct {
@@ -21,13 +22,14 @@ type ErrorResponse struct {
 }
 
 func FileImport(c *gin.Context) {
-	fmt.Println("FileImport")
-	
+	services.Logger().STATUS("FileImport")
+
 	var task models.Task
-	
-	fmt.Println(task)
+
+	// services.Logger().STATUS(fmt.Sprintf("%+v", task))
+
 	if err := c.ShouldBindJSON(&task); err != nil {
-		
+
 		c.JSON(
 			http.StatusBadRequest,
 			ErrorResponse{
@@ -35,10 +37,10 @@ func FileImport(c *gin.Context) {
 				Error:   err.Error(),
 			},
 		)
-		
+
 		return
 	}
-	fmt.Println(task)
+	services.Logger().STATUS(fmt.Sprintf("%+v", task))
 
 	result, err := importer.Service{}.Execute(task)
 
@@ -52,8 +54,7 @@ func FileImport(c *gin.Context) {
 		)
 		return
 	}
-
-	fmt.Println(task)
+	services.Logger().STATUS(fmt.Sprintf("%+v", task))
 
 	c.JSON(
 		http.StatusOK,
@@ -65,13 +66,12 @@ func FileImport(c *gin.Context) {
 }
 
 func ApiImport(c *gin.Context) {
-	fmt.Println("ApiImport")
+	services.Logger().STATUS("ApiImport")
 }
 
 func Healthy(c *gin.Context) {
-	
-	fmt.Println("Healthy")
-	
+	services.Logger().STATUS("Healthy")
+
 	c.JSON(
 		http.StatusOK,
 		gin.H{
