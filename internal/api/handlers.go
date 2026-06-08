@@ -22,14 +22,9 @@ type ErrorResponse struct {
 }
 
 func FileImport(c *gin.Context) {
-	services.Logger().STATUS("--Api-FileImport")
-
+	services.Logger().STATUS("-- Api / FileImport")
 	var task models.Task
-
-	// services.Logger().STATUS(fmt.Sprintf("%+v", task))
-
 	if err := c.ShouldBindJSON(&task); err != nil {
-
 		c.JSON(
 			http.StatusBadRequest,
 			ErrorResponse{
@@ -37,11 +32,10 @@ func FileImport(c *gin.Context) {
 				Error:   err.Error(),
 			},
 		)
-
 		return
 	}
-	services.Logger().STATUS(fmt.Sprintf("%+v", task))
 
+	services.Logger().STATUS(fmt.Sprintf("%+v", task))
 	result, err := importer.Service{}.Execute(task)
 
 	if err != nil {
@@ -66,12 +60,11 @@ func FileImport(c *gin.Context) {
 }
 
 func ApiImport(c *gin.Context) {
-	services.Logger().STATUS("--Api-ApiImport")
+	services.Logger().STATUS("-- Api / ApiImport")
 }
 
 func Healthy(c *gin.Context) {
-	services.Logger().STATUS("--Api-Healthy")
-
+	services.Logger().STATUS("-- Api / Healthy")
 	c.JSON(
 		http.StatusOK,
 		gin.H{

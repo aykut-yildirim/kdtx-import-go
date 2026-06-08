@@ -22,7 +22,7 @@ type MinioService struct {
 
 func NewMinioService() (*MinioService, error) {
 
-	Logger().STATUS("--services / NewMinioService")
+	Logger().STATUS("-- Services / NewMinioService")
 	godotenv.Load(".env")
 	endpoint := os.Getenv("MINIO_ENDPOINT")
 	accessKey := os.Getenv("MINIO_ACCESS_KEY")
@@ -58,7 +58,7 @@ func NewMinioService() (*MinioService, error) {
 
 func (m *MinioService) EnsureBucket(ctx context.Context) error {
 
-	Logger().STATUS("--minio / EnsureBucket")
+	Logger().STATUS("-- Minio / EnsureBucket")
 
 	_, err := m.client.HeadBucket(ctx, &s3.HeadBucketInput{
 		Bucket: aws.String(m.bucket),
@@ -81,7 +81,7 @@ func (m *MinioService) GetFileByPath(
 	key string,
 ) ([]byte, error) {
 
-	Logger().STATUS("--minio / GetFileByPath")
+	Logger().STATUS("-- Minio / GetFileByPath")
 
 	obj, err := m.client.GetObject(context.TODO(), &s3.GetObjectInput{
 		Bucket: aws.String(bucket),
@@ -109,7 +109,7 @@ func (m *MinioService) SavePDF(
 	pdfBytes []byte,
 ) (string, error) {
 
-	Logger().STATUS("--minio / SavePDF")
+	Logger().STATUS("-- Minio / SavePDF")
 
 	err := m.EnsureBucket(ctx)
 	if err != nil {
@@ -144,7 +144,7 @@ func (m *MinioService) SaveMinio(
 	body []byte,
 ) (string, error) {
 
-	Logger().STATUS("--minio / SaveMinio")
+	Logger().STATUS("-- Minio / SaveMinio")
 
 	err := m.EnsureBucket(ctx)
 	if err != nil {

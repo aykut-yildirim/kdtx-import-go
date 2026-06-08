@@ -17,7 +17,7 @@ import (
 
 func GetFile(ctx models.Context) ([]byte, error) {
 	if ctx.Task.FileMinioPath != nil {
-		services.Logger().STATUS("--GetFile / FileMinioPath")
+		services.Logger().STATUS("-- GetFile / FileMinioPath")
 
 		godotenv.Load(".env")
 		bucket := os.Getenv("MINIO_BUCKET")
@@ -35,7 +35,7 @@ func GetFile(ctx models.Context) ([]byte, error) {
 	}
 
 	if ctx.Task.LocalPath != nil {
-		services.Logger().STATUS("--GetFile--LocalPath")
+		services.Logger().STATUS("-- GetFile--LocalPath")
 		services.Logger().STATUS(*ctx.Task.LocalPath)
 
 		fileBytes, err := os.ReadFile(*ctx.Task.LocalPath)
@@ -51,7 +51,7 @@ func GetFile(ctx models.Context) ([]byte, error) {
 }
 
 func ReadTableFromBytes(content []byte, sep string) ([]map[string]string, error) {
-	services.Logger().STATUS("--ReadTableFromBytes")
+	services.Logger().STATUS("-- ReadTableFromBytes")
 	lines := strings.Split(strings.ReplaceAll(string(content), "\r\n", "\n"), "\n")
 	if len(lines) == 0 || lines[0] == "" {
 		return nil, errors.New("empty table content")
@@ -83,8 +83,6 @@ func ReadTableFromBytes(content []byte, sep string) ([]map[string]string, error)
 }
 
 func ParseDatetime(val string) (time.Time, error) {
-	services.Logger().STATUS("--ParseDatetime")
-
 	layouts := []string{
 		"2006-01-02T15:04:05Z07:00",
 		"2006-01-02T15:04:05-07:00",
@@ -103,10 +101,7 @@ func ParseDatetime(val string) (time.Time, error) {
 	return time.Time{}, lastErr
 }
 
-// var moneyRegex = regexp.MustCompile(`[^\d,.\-]`)
-
 func MoneyToFloat(value any) (float64, error) {
-	services.Logger().STATUS("--MoneyToFloat")
 
 	if value == nil {
 		return 0, nil
@@ -131,8 +126,6 @@ func MoneyToFloat(value any) (float64, error) {
 }
 
 func ToStringCombine(sep string, values ...any) string {
-	services.Logger().STATUS("--ToStringCombine")
-
 	out := []string{}
 	for _, v := range values {
 		if v == nil {
@@ -144,8 +137,6 @@ func ToStringCombine(sep string, values ...any) string {
 }
 
 func ToFloatTotal(values ...string) float64 {
-	services.Logger().STATUS("--ToFloatTotal")
-
 	var total float64
 	for _, val := range values {
 		if val != "" {

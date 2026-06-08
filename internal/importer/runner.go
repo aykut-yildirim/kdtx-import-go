@@ -6,8 +6,6 @@ import (
 	"sync"
 )
 
-
-
 // type Pipeline interface {
 // 	Run(task models.Task) (interface{}, error)
 // }
@@ -32,7 +30,7 @@ func Register(
 func Get(
 	key string,
 ) (models.Importer, bool) {
-	services.Logger().STATUS("--Get" + key)
+	services.Logger().STATUS("-- Get / " + key)
 	mu.RLock()
 	defer mu.RUnlock()
 

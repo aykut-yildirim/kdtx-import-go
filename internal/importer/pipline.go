@@ -18,25 +18,25 @@ func (p DefaultPipeline) Run(
 		Task: task,
 	}
 
-	services.Logger().STATUS(task.PortalKeyName + " - FileLoad -")
+	services.Logger().STATUS(task.PortalKeyName + " / FileLoad")
 	if err := p.Importer.FileLoad(ctx); err != nil {
 
 		return nil, err
 
 	}
-	services.Logger().STATUS(task.PortalKeyName + " - LoginControl -")
+	services.Logger().STATUS(task.PortalKeyName + " / LoginControl")
 	if err := p.Importer.LoginControl(ctx); err != nil {
 
 		return nil, err
 	}
 
-	services.Logger().STATUS(task.PortalKeyName + " - Fetch -")
+	services.Logger().STATUS(task.PortalKeyName + " / Fetch")
 	if err := p.Importer.Fetch(ctx); err != nil {
 
 		return nil, err
 	}
 
-	services.Logger().STATUS(task.PortalKeyName + " - Map -")
+	services.Logger().STATUS(task.PortalKeyName + " / Map")
 		if err := p.Importer.Map(ctx); err != nil {
 
 		return nil, err
@@ -45,11 +45,11 @@ func (p DefaultPipeline) Run(
 
 	}
 
-	if ctx.Task.IsRawDataAdded {
-
+	if !ctx.Task.IsRawDataAdded {
+		ctx.RawData = []byte{}
 	}
 	if ctx.Task.IsResponse {
-		return ctx.Data, nil
+		return ctx, nil
 
 	}
 
