@@ -42,7 +42,7 @@ func (i TransactionFileImporter) Fetch(
 
 func (i TransactionFileImporter) Map(
 	ctx *models.Context,
-) (interface{}, error) {
+) error {
 
 	rows := ctx.Parsed.([][]string)
 
@@ -60,5 +60,5 @@ func (i TransactionFileImporter) Map(
 
 	ctx.Result = transactions
 
-	return ctx.Result, nil
+	return nil
 }

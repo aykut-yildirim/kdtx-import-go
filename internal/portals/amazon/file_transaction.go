@@ -10,7 +10,6 @@ import (
 
 	"myapp/internal/helpers"
 	"myapp/internal/models"
-	"myapp/internal/services"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -20,7 +19,6 @@ type TransactionFileImporter struct{}
 func (i TransactionFileImporter) FileLoad(
 	ctx *models.Context,
 ) error {
-	services.Logger().STATUS("- FileLoad -")
 	data, err := helpers.GetFile(*ctx)
 	if err != nil {
 		return err
@@ -143,10 +141,10 @@ func toColumnName(fieldName string) string {
 
 func (i TransactionFileImporter) Map(
 	ctx *models.Context,
-) (interface{}, error) {
+) error {
 	dfDict, err := helpers.ReadTableFromBytes(ctx.RawData, "\t")
 	if err != nil {
-		return nil, fmt.Errorf("failed to read table: %w", err)
+		return fmt.Errorf("failed to read table: %w", err)
 	}
 	_transactions_dict := make(map[string][]map[string]string)
 	validate := validator.New()
@@ -174,10 +172,10 @@ func (i TransactionFileImporter) Map(
 					fieldName := fieldErr.Field()
 					columnName := toColumnName(fieldName)
 					errorMsg := fmt.Sprintf("failed validation on tag '%s'", fieldErr.Tag())
-					return nil, fmt.Errorf("Validation error at row %d (data row %d), column '%s': %s", idx+2, idx+1, columnName, errorMsg)
+					return fmt.Errorf("Validation error at row %d (data row %d), column '%s': %s", idx+2, idx+1, columnName, errorMsg)
 				}
 			}
-			return nil, fmt.Errorf("Validation error at row %d (data row %d): %w", idx+2, idx+1, err)
+			return  fmt.Errorf("Validation error at row %d (data row %d): %w", idx+2, idx+1, err)
 		}
 
 		if (row["transaction-type"] == "Order" || row["transaction-type"] == "Refund") && row["order-id"] != "" {
@@ -435,5 +433,5 @@ func (i TransactionFileImporter) Map(
 		push(_transaction, _details)
 	}
 	ctx.Result = ctx.Data
-	return ctx, nil
+	return nil
 }

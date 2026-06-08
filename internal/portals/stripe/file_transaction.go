@@ -6,7 +6,6 @@ import (
 
 	"myapp/internal/helpers"
 	"myapp/internal/models"
-	"myapp/internal/services"
 )
 
 type TransactionFileImporter struct{}
@@ -14,11 +13,7 @@ type TransactionFileImporter struct{}
 func (i TransactionFileImporter) FileLoad(
 	ctx *models.Context,
 ) error {
-	services.Logger().STATUS("- FileLoad -")
 	data, err := helpers.GetFile(*ctx)
-
-	services.Logger().STATUS("test")
-
 	if err != nil {
 		return err
 	}
@@ -43,7 +38,7 @@ func (i TransactionFileImporter) Fetch(
 
 func (i TransactionFileImporter) Map(
 	ctx *models.Context,
-) (interface{}, error) {
+)  error {
 
 	var transactions []map[string]interface{}
 
@@ -54,13 +49,10 @@ func (i TransactionFileImporter) Map(
 	rows, err := reader.ReadAll()
 
 	if err != nil {
-		return transactions, err
+		return  err
 	}
 
 	for index, row := range rows {
-
-		// services.Logger().STATUS(index, row)
-
 		transactions = append(
 			transactions,
 			map[string]interface{}{
@@ -72,5 +64,5 @@ func (i TransactionFileImporter) Map(
 
 	ctx.Result = transactions
 
-	return ctx.Result, nil
+	return nil
 }

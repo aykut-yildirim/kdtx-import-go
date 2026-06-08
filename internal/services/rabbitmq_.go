@@ -6,15 +6,9 @@ import (
 	"os"
 	"sync"
 
+	"github.com/joho/godotenv"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
-
-var (
-	rabbitURL   = os.Getenv("RABBITMQ_URL")
-	rabbitQueue = os.Getenv("RABBITMQ_QUEUE")
-)
-
-// ---------------- SERVICE ----------------
 
 type RabbitmqService struct {
 	url   string
@@ -26,7 +20,11 @@ type RabbitmqService struct {
 
 // ---------------- CONSTRUCTOR ----------------
 
-func NewRabbitmqService(url, queue string) (*RabbitmqService, error) {
+func NewRabbitmqService(url string, queue string) (*RabbitmqService, error) {
+
+	godotenv.Load(".env")
+	rabbitURL   := os.Getenv("RABBITMQ_URL")
+	rabbitQueue := os.Getenv("RABBITMQ_QUEUE")
 
 	if url == "" {
 		url = rabbitURL

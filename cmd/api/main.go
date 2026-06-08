@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	services.Logger().STATUS("-- api - main.go")
+	services.Logger().STATUS("--Api-main.go")
 
 	r := gin.Default()
 

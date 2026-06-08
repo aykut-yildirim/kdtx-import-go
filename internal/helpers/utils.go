@@ -16,9 +16,9 @@ import (
 )
 
 func GetFile(ctx models.Context) ([]byte, error) {
-	services.Logger().STATUS("--GetFile")
 	if ctx.Task.FileMinioPath != nil {
-		services.Logger().STATUS("--GetFile--FileMinioPath")
+		services.Logger().STATUS("--GetFile / FileMinioPath")
+
 		godotenv.Load(".env")
 		bucket := os.Getenv("MINIO_BUCKET")
 		key := *ctx.Task.FileMinioPath
@@ -36,7 +36,6 @@ func GetFile(ctx models.Context) ([]byte, error) {
 
 	if ctx.Task.LocalPath != nil {
 		services.Logger().STATUS("--GetFile--LocalPath")
-		// services.Logger().STATUS(ctx.Task.LocalPath)
 		services.Logger().STATUS(*ctx.Task.LocalPath)
 
 		fileBytes, err := os.ReadFile(*ctx.Task.LocalPath)
@@ -44,81 +43,15 @@ func GetFile(ctx models.Context) ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
+
 		return fileBytes, nil
 	}
 
 	return nil, errors.New("missing file information")
 }
 
-func ParseDatetime(val string) (time.Time, error) {
-	layouts := []string{
-		"2006-01-02T15:04:05Z07:00",
-		"2006-01-02T15:04:05-07:00",
-		"2006-01-02T15:04:05-0700",
-		"2006-01-02T15:04:05",
-		"2006-01-02",
-	}
-	var lastErr error
-	for _, l := range layouts {
-		t, err := time.Parse(l, val)
-		if err == nil {
-			return t, nil
-		}
-		lastErr = err
-	}
-	return time.Time{}, lastErr
-}
-
-var moneyRegex = regexp.MustCompile(`[^\d,.\-]`)
-
-func MoneyToFloat(value any) (float64, error) {
-	if value == nil {
-		return 0, nil
-	}
-
-	switch v := value.(type) {
-	case int:
-		return float64(v), nil
-	case float64:
-		return v, nil
-	}
-
-	str := fmt.Sprint(value)
-	clean := moneyRegex.ReplaceAllString(str, "")
-	clean = strings.ReplaceAll(clean, ",", ".")
-
-	if !regexp.MustCompile(`\d`).MatchString(clean) {
-		return 0, nil
-	}
-
-	return strconv.ParseFloat(clean, 64)
-}
-
-func ToStringCombine(sep string, values ...any) string {
-	out := []string{}
-	for _, v := range values {
-		if v == nil {
-			continue
-		}
-		out = append(out, fmt.Sprint(v))
-	}
-	return strings.Join(out, sep)
-}
-
-func ToFloatTotal(values ...string) float64 {
-	var total float64
-	for _, val := range values {
-		if val != "" {
-			f, err := MoneyToFloat(val)
-			if err == nil {
-				total += f
-			}
-		}
-	}
-	return total
-}
-
 func ReadTableFromBytes(content []byte, sep string) ([]map[string]string, error) {
+	services.Logger().STATUS("--ReadTableFromBytes")
 	lines := strings.Split(strings.ReplaceAll(string(content), "\r\n", "\n"), "\n")
 	if len(lines) == 0 || lines[0] == "" {
 		return nil, errors.New("empty table content")
@@ -147,4 +80,108 @@ func ReadTableFromBytes(content []byte, sep string) ([]map[string]string, error)
 		records = append(records, row)
 	}
 	return records, nil
+}
+
+func ParseDatetime(val string) (time.Time, error) {
+	services.Logger().STATUS("--ParseDatetime")
+
+	layouts := []string{
+		"2006-01-02T15:04:05Z07:00",
+		"2006-01-02T15:04:05-07:00",
+		"2006-01-02T15:04:05-0700",
+		"2006-01-02T15:04:05",
+		"2006-01-02",
+	}
+	var lastErr error
+	for _, l := range layouts {
+		t, err := time.Parse(l, val)
+		if err == nil {
+			return t, nil
+		}
+		lastErr = err
+	}
+	return time.Time{}, lastErr
+}
+
+// var moneyRegex = regexp.MustCompile(`[^\d,.\-]`)
+
+func MoneyToFloat(value any) (float64, error) {
+	services.Logger().STATUS("--MoneyToFloat")
+
+	if value == nil {
+		return 0, nil
+	}
+
+	switch v := value.(type) {
+	case int:
+		return float64(v), nil
+	case float64:
+		return v, nil
+	}
+
+	str := fmt.Sprint(value)
+	clean := regexp.MustCompile(`[^\d,.\-]`).ReplaceAllString(str, "")
+	clean = strings.ReplaceAll(clean, ",", ".")
+
+	if !regexp.MustCompile(`\d`).MatchString(clean) {
+		return 0, nil
+	}
+
+	return strconv.ParseFloat(clean, 64)
+}
+
+func ToStringCombine(sep string, values ...any) string {
+	services.Logger().STATUS("--ToStringCombine")
+
+	out := []string{}
+	for _, v := range values {
+		if v == nil {
+			continue
+		}
+		out = append(out, fmt.Sprint(v))
+	}
+	return strings.Join(out, sep)
+}
+
+func ToFloatTotal(values ...string) float64 {
+	services.Logger().STATUS("--ToFloatTotal")
+
+	var total float64
+	for _, val := range values {
+		if val != "" {
+			f, err := MoneyToFloat(val)
+			if err == nil {
+				total += f
+			}
+		}
+	}
+	return total
+}
+
+func ToFloat64(v interface{}) float64 {
+	switch val := v.(type) {
+	case float64:
+		return val
+	case int:
+		return float64(val)
+	case int64:
+		return float64(val)
+	}
+	return 0
+}
+
+func FromUnixToTime(v interface{}) time.Time {
+	unix := int64(ToFloat64(v))
+	if unix == 0 {
+		return time.Time{}
+	}
+	return time.Unix(unix, 0).UTC()
+}
+
+func ToUnixTimestamp(dateStr string) int64 {
+	t, err := time.Parse("2006-01-02", dateStr)
+	if err != nil {
+		return 0
+	}
+	return t.Unix()
 }

@@ -22,7 +22,7 @@ type ErrorResponse struct {
 }
 
 func FileImport(c *gin.Context) {
-	services.Logger().STATUS("FileImport")
+	services.Logger().STATUS("--Api-FileImport")
 
 	var task models.Task
 
@@ -54,7 +54,7 @@ func FileImport(c *gin.Context) {
 		)
 		return
 	}
-	services.Logger().STATUS(fmt.Sprintf("%+v", task))
+	services.Logger().STATUS("****" + fmt.Sprintf("%+v", task))
 
 	c.JSON(
 		http.StatusOK,
@@ -66,11 +66,11 @@ func FileImport(c *gin.Context) {
 }
 
 func ApiImport(c *gin.Context) {
-	services.Logger().STATUS("ApiImport")
+	services.Logger().STATUS("--Api-ApiImport")
 }
 
 func Healthy(c *gin.Context) {
-	services.Logger().STATUS("Healthy")
+	services.Logger().STATUS("--Api-Healthy")
 
 	c.JSON(
 		http.StatusOK,

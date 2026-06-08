@@ -5,8 +5,13 @@ import "myapp/internal/importer"
 func init() {
 
 	importer.Register(
-		"stripe:file:transaction",
-		TransactionFileImporter{},
+		"stripe:api:transaction",
+		TransactionApiImporter{},
 	)
+	
+	// importer.Register(
+	// 	"stripe:file:transaction",
+	// 	TransactionFileImporter{},
+	// )
 	
 }

@@ -7,7 +7,7 @@ import (
 )
 
 type DefaultPipeline struct {
-	Importer Importer
+	Importer models.Importer
 }
 
 func (p DefaultPipeline) Run(
@@ -18,27 +18,48 @@ func (p DefaultPipeline) Run(
 		Task: task,
 	}
 
-	services.Logger().STATUS(task.PortalKeyName + "- FileLoad -")
+	services.Logger().STATUS(task.PortalKeyName + " - FileLoad -")
 	if err := p.Importer.FileLoad(ctx); err != nil {
 
 		return nil, err
 
 	}
-	services.Logger().STATUS("test 1")
-	services.Logger().STATUS(task.PortalKeyName + "- LoginControl -")
+	services.Logger().STATUS(task.PortalKeyName + " - LoginControl -")
 	if err := p.Importer.LoginControl(ctx); err != nil {
 
 		return nil, err
 	}
 
-	services.Logger().STATUS(task.PortalKeyName + "- Fetch -")
+	services.Logger().STATUS(task.PortalKeyName + " - Fetch -")
 	if err := p.Importer.Fetch(ctx); err != nil {
 
 		return nil, err
 	}
 
-	services.Logger().STATUS(task.PortalKeyName + "- Map -")
-	return p.Importer.Map(ctx)
+	services.Logger().STATUS(task.PortalKeyName + " - Map -")
+		if err := p.Importer.Map(ctx); err != nil {
+
+		return nil, err
+	}
+	if ctx.Task.IsMinioSaved {
+
+	}
+
+	if ctx.Task.IsRawDataAdded {
+
+	}
+	if ctx.Task.IsResponse {
+		return ctx.Data, nil
+
+	}
+
+	// return ctx.Data, nil
+	return map[string]interface{}{
+		"IsMinioSaved":           ctx.Task.IsMinioSaved,
+		"IsRawDataAdded":         ctx.Task.IsRawDataAdded,
+		"IsResponse":             ctx.Task.IsResponse,
+		"success":                true,
+}, nil
 }
 
 type Service struct{}
@@ -48,7 +69,7 @@ func (s Service) Execute(
 ) (interface{}, error) {
 
 	services.Logger().STATUS("-- Service Execute")
-	services.Logger().STATUS(fmt.Sprintf("%+v", task))
+	// services.Logger().STATUS(fmt.Sprintf("%+v", task))
 	key := fmt.Sprintf(
 		"%s:%s:%s",
 		task.PortalKeyName,

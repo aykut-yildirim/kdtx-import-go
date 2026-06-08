@@ -11,29 +11,37 @@ import (
 )
 
 type Task struct {
-	PortalKeyName      string                 `json:"portal_key_name" validate:"required"`
-	InputType          string                 `json:"input_type" validate:"required,oneof=api file"`
-	PortalType         string                 `json:"portal_type" validate:"required,oneof=transaction invoice_out invoice_in"`
-	AccountID          int                    `json:"account_id"`
-	ClientID           int                    `json:"client_id"`
-	TaskID             int                    `json:"task_id"`
-	FetchStartDate     *string                `json:"fetch_start_date,omitempty"`
-	FetchEndDate       *string                `json:"fetch_end_date,omitempty"`
-	Credentials        map[string]interface{} `json:"credentials,omitempty"`
-	FileMinioPath      *string                `json:"file_minio_path,omitempty"`
-	LocalPath          *string                `json:"local_path,omitempty"`
-	AccountingPatterns map[string]interface{} `json:"accounting_patterns,omitempty"`
-	IsAPI              bool                   `json:"is_api"`
-	IsResponse         bool                   `json:"is_response"`
-	Log                *string                `json:"log,omitempty"`
+	PortalKeyName		string					`json:"portal_key_name" validate:"required"`
+	InputType			string					`json:"input_type" validate:"required,oneof=api file"`
+	PortalType			string					`json:"portal_type" validate:"required,oneof=transaction invoice_out invoice_in"`
+	AccountID			int						`json:"account_id"`
+	ClientID			int						`json:"client_id"`
+	TaskID				int						`json:"task_id"`
+	FetchStartDate		*string					`json:"fetch_start_date,omitempty"`
+	FetchEndDate		*string					`json:"fetch_end_date,omitempty"`
+	FileMinioPath		*string					`json:"file_minio_path,omitempty"`
+	LocalPath			*string					`json:"local_path,omitempty"`
+	Credentials			map[string]interface{}	`json:"credentials,omitempty"`
+	AccountingPatterns	map[string]interface{}	`json:"accounting_patterns,omitempty"`
+	IsResponse			bool					`json:"is_response"`
+	IsMinioSaved		bool					`json:"Is_minio_saved"`
+	IsRawDataAdded		bool					`json:"is_raw_data_added"`
+	Log					*string					`json:"log,omitempty"`
 }
 
 type Context struct {
-	Task      Task
-	RawData   []byte
-	Data      []DataAll `json:"data"`
-	Parsed    interface{}
-	Result    interface{}
+	Task		Task			
+	RawData		[]byte			
+	Data		[]DataAll 		`json:"data"`
+	Parsed		interface{}		
+	Result		interface{}		
+}
+
+type Importer interface {
+	FileLoad(*Context) error
+	LoginControl(*Context) error
+	Fetch(*Context) error
+	Map(*Context) error
 }
 
 type DataAll struct {

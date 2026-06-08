@@ -8,13 +8,6 @@ import (
 	"google.golang.org/grpc"
 )
 
-// var (
-// 	grpcEnabled = os.Getenv("GRPC_ENABLED") == "true"
-// 	grpcAddr    = os.Getenv("GRPC_IMPORT_WORKER_ADDR")
-// )
-
-// ---------------- COLORS ----------------
-
 var colors = map[string]string{
 	"-INFO-":   "\033[92m",
 	"SUCCESS":  "\033[92m",
@@ -82,14 +75,3 @@ func (l *Log) FINISHED(taskID string) {
 func (l *Log) ERROR(err error) {
 	l.logger.write("ERROR", err.Error())
 }
-
-// func LoggerSystem(message string) {
-// 	LoggerServiceInstance.SYSTEM(message)
-// }
-
-// func LoggerStatus(message string, taskID int) {
-// 	LoggerServiceInstance.STATUS(fmt.Sprintf("%s (TaskID: %d)", message, taskID))
-// }
-
-// var LoggerServiceInstance = NewLog()
-

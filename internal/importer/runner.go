@@ -6,12 +6,7 @@ import (
 	"sync"
 )
 
-type Importer interface {
-	FileLoad(*models.Context) error
-	LoginControl(*models.Context) error
-	Fetch(*models.Context) error
-	Map(*models.Context) (interface{}, error)
-}
+
 
 // type Pipeline interface {
 // 	Run(task models.Task) (interface{}, error)
@@ -19,13 +14,15 @@ type Importer interface {
 
 var (
 	mu       sync.RWMutex
-	registry = map[string]Importer{}
+	registry = map[string]models.Importer{}
 )
 
 func Register(
 	key string,
-	imp Importer,
+	imp models.Importer,
 ) {
+	services.Logger().STATUS("--Register" + key)
+
 	mu.Lock()
 	defer mu.Unlock()
 
@@ -34,8 +31,8 @@ func Register(
 
 func Get(
 	key string,
-) (Importer, bool) {
-	services.Logger().STATUS("Get" + key)
+) (models.Importer, bool) {
+	services.Logger().STATUS("--Get" + key)
 	mu.RLock()
 	defer mu.RUnlock()
 
